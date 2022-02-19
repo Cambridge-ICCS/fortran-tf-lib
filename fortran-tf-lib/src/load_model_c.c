@@ -59,6 +59,8 @@ int main() {
     0.50751284, 0.65207096};
     const int64_t input_dims[] = {1, 32};
     const int64_t output_dims[] = {1};
+    float output_value;
+
 
     printf("Hello from TensorFlow C library version %s\n", TF_Version());
 
@@ -114,21 +116,27 @@ Method name is: tensorflow/serving/predict
         exit(1);
     }
 
+/*
     input = TF_AllocateTensor( TF_FLOAT, input_dims, 2, 32*sizeof(TF_FLOAT) );
     if (input == NULL) {
         printf("allocate error\n");
     }
     input_data_ptr = TF_TensorData(input);
     memcpy(input_data_ptr, raw_inp, 32*sizeof(TF_FLOAT));
-
-    input_values[0] = input;
-    output_values[0] = NULL;
-
+*/
 /* TF_CAPI_EXPORT extern TF_Tensor* TF_NewTensor(
     TF_DataType, const int64_t* dims, int num_dims, void* data, size_t len,
     void (*deallocator)(void* data, size_t len, void* arg),
     void* deallocator_arg);
 */
+    input = TF_NewTensor(
+        TF_FLOAT, input_dims, 2, raw_inp, 32*sizeof(TF_FLOAT),
+        &null_dealloc, NULL
+    );
+
+    input_values[0] = input;
+    output_values[0] = NULL;
+
 
     TF_SessionRun(
         session,          // TF_Session* session,
@@ -155,7 +163,14 @@ Method name is: tensorflow/serving/predict
     }
 
     output_data_ptr = TF_TensorData(output_values[0]);
-    printf("Finished, output= %f\n", *((float*)output_data_ptr));
+    output_value = *((float*)output_data_ptr);
+
+    printf("\n\nFinished, output= %f\n", output_value);
+    if ((output_value - -0.479371) > 1e-6) {
+        printf("Output does not match, FAILED!\n");
+    } else {
+        printf("Output is correct, SUCCESS!\n");
+    }
 
 
     /* Do stuff */

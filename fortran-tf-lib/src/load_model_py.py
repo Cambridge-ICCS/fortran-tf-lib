@@ -14,7 +14,9 @@ test_raw = [[
 
 test_input = np.random.random((1, 32))
 print( test_input )
-print( reconstructed_model.predict(test_raw) )
-
-print( reconstructed_model.summary() )
-
+output_value = reconstructed_model.predict(test_raw)
+print( '\n\nFinished, output= {}\n'.format(output_value) )
+if (output_value - -0.479371) > 1e-6:
+    print( 'Output does not match, FAILURE!\n')
+else:
+    print( 'Output is correct, SUCCESS!\n')
