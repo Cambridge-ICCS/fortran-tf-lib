@@ -8,7 +8,7 @@ Here's some initial code for this library.  In `src/` you'll find:
 
 ## Building
 
-You'll need the TensorFlow C API, download from https://www.tensorflow.org/install/lang\_c.  I've only
+You'll need the TensorFlow C API, download from https://www.tensorflow.org/install/lang_c.  I've only
 tested the CPU one.  Looks like the newer 2.8.0 is available if you change the download URL.  Untar this
 somewhere and set `TF_C_API` in your environment to the location, such that:
 
