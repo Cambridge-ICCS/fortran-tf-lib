@@ -312,7 +312,7 @@ contains
         TF_LoadSessionFromSavedModel%p = &
             TF_LoadSessionFromSavedModel_c( &
                 session_options%p, run_options%p, export_dir_ptr, &
-                tag_ptrs, tags_len, graph%p, meta_graph_def%p, &
+                c_loc(tag_ptrs), tags_len, graph%p, meta_graph_def%p, &
                 stat%p &
             )
     end function TF_LoadSessionFromSavedModel
