@@ -266,7 +266,7 @@ contains
 
         character(len=len(export_dir)+1), target :: export_dir_temp
         type(c_ptr)                              :: export_dir_ptr
-        type(c_ptr), dimension(tags_len)         :: tag_ptrs
+        type(c_ptr), dimension(tags_len), target :: tag_ptrs
         integer                                  :: i
         character(len=len(tags)+1), dimension(tags_len), target :: tags_temp
 
@@ -410,7 +410,7 @@ contains
         integer(kind(TF_FLOAT))               :: datatype
         integer(kind=c_int64_t), dimension(:) :: dims
         integer                               :: num_dims
-        type(*), dimension(..), target        :: data
+        type(*), dimension(..), target, contiguous        :: data
         integer(kind=c_size_t)                :: len
 
         type(c_ptr)                           :: data_ptr
@@ -420,11 +420,12 @@ contains
     end function TF_NewTensor_2018
 #endif
 !   This function does not use F2018 features but requires caller to create a c_ptr for data
+!   and to check that the array pointed to is contiguous.
     function TF_NewTensor_cptr( datatype, dims, num_dims, data, len )
         use TF_Types
         type(TF_Tensor)                               :: TF_NewTensor_cptr
         integer(kind(TF_FLOAT))                       :: datatype
-        integer(kind=c_int64_t), dimension(:), target :: dims
+        integer(kind=c_int64_t), dimension(num_dims), target :: dims
         integer                                       :: num_dims
         type(c_ptr)                                   :: data
         integer(kind=c_size_t)                        :: len
@@ -458,28 +459,43 @@ contains
     subroutine TF_SessionRun( session, inputs, input_values, ninputs, outputs, output_values, noutputs, &
             target_opers, ntargets, stat, run_options_opt, run_metadata_opt )
         use TF_Types
-        type(TF_Session)                 :: session
-        type(TF_Output)                  :: inputs
-        type(TF_Tensor), dimension(:)    :: input_values
-        integer(kind=c_int)              :: ninputs
-        type(TF_Output)                  :: outputs
-        type(TF_Tensor), dimension(:)    :: output_values
-        integer(kind=c_int)              :: noutputs
-        type(TF_Operation), dimension(:) :: target_opers
-        integer(kind=c_int)              :: ntargets
-        type(TF_Status)                  :: stat
-        type(TF_Buffer), optional        :: run_options_opt
-        type(TF_Buffer)                  :: run_options
-        type(TF_Buffer), optional        :: run_metadata_opt
-        type(TF_Buffer)                  :: run_metadata
+        type(TF_Session)                       :: session
+        type(TF_Output), dimension(ninputs)    :: inputs
+        type(TF_Tensor), dimension(ninputs)    :: input_values
+        integer(kind=c_int)                    :: ninputs
+        type(TF_Output), dimension(noutputs)   :: outputs
+        type(TF_Tensor), dimension(noutputs)   :: output_values
+        integer(kind=c_int)                    :: noutputs
+        type(TF_Operation), dimension(ntargets):: target_opers
+        integer(kind=c_int)                    :: ntargets
+        type(TF_Status)                        :: stat
+        type(TF_Buffer), optional              :: run_options_opt
+        type(TF_Buffer)                        :: run_options
+        type(TF_Buffer), optional              :: run_metadata_opt
+        type(TF_Buffer)                        :: run_metadata
 
         type(c_ptr), dimension(ninputs), target  :: input_value_ptrs
         type(c_ptr), dimension(noutputs), target :: output_value_ptrs
         type(c_ptr), dimension(ntargets), target :: target_oper_ptrs
         integer                                  :: i
-        type(TF_Output_Actual), target           :: input_act, output_act
+        type(TF_Output_Actual), dimension(ninputs), target           :: input_act
+        type(TF_Output_Actual), dimension(noutputs), target          :: output_act
         type(c_ptr)                              :: input_act_ptr, output_act_ptr
         interface
+!TF_CAPI_EXPORT extern void TF_SessionRun(
+!    TF_Session* session,
+!    // RunOptions
+!    const TF_Buffer* run_options,
+!    // Input tensors
+!    const TF_Output* inputs, TF_Tensor* const* input_values, int ninputs,
+!    // Output tensors
+!    const TF_Output* outputs, TF_Tensor** output_values, int noutputs,
+!    // Target operations
+!    const TF_Operation* const* target_opers, int ntargets,
+!    // RunMetadata
+!    TF_Buffer* run_metadata,
+!    // Output status
+!    TF_Status*);
             subroutine TF_SessionRun_c( session, run_options, inputs, input_values, ninputs, outputs, &
                     output_values, noutputs, target_opers, ntargets, run_metadata, stat) &
                     bind(c, name="TF_SessionRun")
@@ -509,22 +525,25 @@ contains
         else
             run_metadata%p = c_null_ptr
         endif
+
         do i = 1, ninputs
             input_value_ptrs(i) = input_values(i)%p
+            input_act(i)%oper_ptr = inputs(i)%oper%p
+            input_act(i)%index = inputs(i)%index
         end do
+        input_act_ptr = c_loc(input_act)
+
         do i = 1, noutputs
             output_value_ptrs(i) = output_values(i)%p
+            output_act(i)%oper_ptr = outputs(i)%oper%p
+            output_act(i)%index = outputs(i)%index
         end do
+        output_act_ptr = c_loc(output_act)
+
         do i = 1, ntargets
             target_oper_ptrs(i) = target_opers(i)%p
         end do
 
-        input_act%oper_ptr = inputs%oper%p
-        input_act%index = inputs%index
-        input_act_ptr = c_loc(input_act)
-        output_act%oper_ptr = outputs%oper%p
-        output_act%index = outputs%index
-        output_act_ptr = c_loc(output_act)
 
         call TF_SessionRun_c( session%p, run_options%p, input_act_ptr, c_loc(input_value_ptrs), ninputs, &
             output_act_ptr, c_loc(output_value_ptrs), noutputs, c_loc(target_oper_ptrs), ntargets, run_metadata%p, &
