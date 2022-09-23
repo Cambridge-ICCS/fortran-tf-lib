@@ -35,7 +35,7 @@ jobs:
 
       # Install dependencies
       - name: apt install deps
-        run: sudo apt install gfortran
+        run: sudo apt install gfortran build-essential
         
       # Install pip deps
       - name: pip requirements
