@@ -4,7 +4,7 @@ import os
 
 @pytest.fixture
 def tf_lib():
-    return subprocess.run(["make", "-C", "../../src"], check=True)
+    return subprocess.run(["make", "-C", "../src"], check=True)
 
 def test_f90_created():
 	"""
