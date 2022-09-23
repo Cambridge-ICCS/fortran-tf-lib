@@ -33,6 +33,6 @@ jobs:
 
       # Runs a set of commands using the runners shell
       - name: Run the pytest tests in tools
-        working-directory: $GITHUB_WORKSPACE/fortran-tf-lib/tools
+        working-directory: fortran-tf-lib/tools
         run: |
           pytest tests
