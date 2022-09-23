@@ -41,7 +41,7 @@ jobs:
       - name: pip requirements
         working-directory: fortran-tf-lib/tools
         run: |
-          pip install ./process_model
+          pip install -e ./process_model
           pip install pytest
 
       # Runs a set of commands using the runners shell
