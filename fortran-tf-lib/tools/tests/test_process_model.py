@@ -2,6 +2,10 @@ import pytest
 import subprocess
 import os
 
+@pytest.fixture
+def tf_lib():
+    return subprocess.run(["make", "-C", "../../src"], check=True)
+
 def test_f90_created():
 	"""
 	test if process_model generates the FORTRAN file
@@ -10,7 +14,7 @@ def test_f90_created():
 	assert os.path.isfile("testf.f90")
 	os.remove("testf.f90")
 
-def test_f90_compile():
+def test_f90_compile(tf_lib):
 	""" 
 	test if the FORTRAN file generated from process_model compiles
 	"""
