@@ -1,7 +1,5 @@
-FC=ifort
-#FC=gfortran
-CC=icc
-#CC=gcc
+FC?=ifort
+CC?=icc
 
 ifeq "$(FC)" 'ifort'
 FCFLAGS+=-g
