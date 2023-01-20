@@ -9,6 +9,11 @@ set(PACKAGE_VERSION 0.1)
 project(${PROJECT_NAME} VERSION ${PACKAGE_VERSION} LANGUAGES Fortran C)
 enable_testing()
 
+# Set default build type to Debug.
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Debug CACHE STRING "" FORCE)
+endif()
+
 message(STATUS "Compiler is ${CMAKE_Fortran_COMPILER_ID}")
 message(STATUS "Compiler is ${CMAKE_Fortran_COMPILER_VERSION}")
 # require at least gfortran 9.0
