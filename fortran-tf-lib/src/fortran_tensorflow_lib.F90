@@ -588,7 +588,40 @@ contains
         end interface
 
         TF_TensorData = TF_TensorData_c( tensor%p )
-
     end function TF_TensorData
+
+    function TF_NumDims( tensor )
+        use TF_Types
+        integer(kind=c_int) :: TF_NumDims
+        type(TF_Tensor) :: tensor
+
+        interface
+            function TF_NumDims_c( tensor ) bind(c, name="TF_NumDims")
+                use iso_c_binding
+                integer(kind=c_int) :: TF_TensorData_c
+                type(c_ptr), value :: tensor
+            end function TF_NumDims_c
+        end interface
+
+        TF_NumDims = TF_NumDims_c( tensor%p )
+    end function TF_NumDims
+
+    function TF_Dim( tensor, indx )
+        use TF_Types
+        integer(kind=c_int64_t) :: TF_Dim
+        type(TF_Tensor) :: tensor
+        integer(kind=c_int) :: indx
+
+        interface
+            function TF_Dim_c( tensor, indx ) bind(c, name="TF_Dim")
+                use iso_c_binding
+                integer(kind=c_int64_t) :: TF_TensorData_c
+                type(c_ptr), value :: tensor
+                integer(kind=c_int) :: indx
+            end function TF_Dim_c
+        end interface
+
+        TF_Dim = TF_Dim_c( tensor%p, indx )
+    end function TF_Dim
 
 end module TF_Interface
