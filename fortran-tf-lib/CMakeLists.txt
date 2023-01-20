@@ -64,7 +64,7 @@ find_library(TF_FRAMEWORK
     DOC "Location of tensorflow framework library"
 )
 if(NOT TF_FRAMEWORK)
-    message(FATAL_ERROR "Could not find libtensorflow.so")
+    message(FATAL_ERROR "Could not find libtensorflow_framework.so")
 endif()
 list(APPEND TENSORFLOW_LIBRARIES ${TF_FRAMEWORK})
 
