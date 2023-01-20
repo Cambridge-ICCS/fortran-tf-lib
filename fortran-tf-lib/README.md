@@ -6,12 +6,12 @@ C API.  There is enough to load and infer any TensorFlow model from Fortran.
 ## Building
 
 You'll need the TensorFlow C API, download from
-[https://www.tensorflow.org/install/lang_c].  I've only tested the CPU one.
+https://www.tensorflow.org/install/lang_c.  I've only tested the CPU one.
 Newer versions may be available if you change the download URL.  Install this
-somewhere (e.g. `/path/to/tf_c_api`).
+somewhere (e.g. `/path/to/tf_c_api`) such that:
 
 ```
-$ ls $TF_C_API
+$ ls <path/to/tf_c_api>
 include  lib  LICENSE  THIRD_PARTY_TF_C_LICENSES
 ```
 
@@ -21,7 +21,7 @@ as the `CMakeLists.txt` file, `cd` to it, and run `cmake ..`.
 
 ```
 $ ls
-CMakeLists.txt  my_model  README.md  .README.md.swp  src  tests
+CMakeLists.txt  my_model  README.md  src  tests
 $ mkdir build
 $ cd build
 $ cmake ..
@@ -32,7 +32,7 @@ You will probably need to help it find the latter by passing the
 `-DTENSORFLOW_LOCATION` variable to cmake.  You can also override its choice of
 compilers with `-DCMAKE_Fortran_COMPILER` and `-DCMAKE_C_COMPILER`.  It's best
 to not mix compilers from different vendors.  You may also specify where the
-library is to be installed, with `-DCMAKE_INSTALL_PREFIX`.  So a full
+library is to be installed with `-DCMAKE_INSTALL_PREFIX`.  So a full
 invocation of `cmake` might look like this:
 
 ```
