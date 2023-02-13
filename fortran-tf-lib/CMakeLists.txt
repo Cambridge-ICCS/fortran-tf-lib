@@ -17,7 +17,7 @@ endif()
 message(STATUS "Compiler is ${CMAKE_Fortran_COMPILER_ID}")
 message(STATUS "Compiler is ${CMAKE_Fortran_COMPILER_VERSION}")
 # require at least gfortran 9.0
-# the library seems to *crash* gfortran below 9
+# the library seems to *crash* gfortran 8.5.0 during compilation
 # no known failures with Intel (tested down to 2016)
 if("${CMAKE_Fortran_COMPILER_ID}" STREQUAL "GNU")
     if (CMAKE_Fortran_COMPILER_VERSION VERSION_LESS 9.0)
