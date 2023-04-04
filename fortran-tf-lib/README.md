@@ -31,9 +31,10 @@ CMake will attempt to find Fortran and C compilers, and the TensorFlow library.
 You will probably need to help it find the latter by passing the
 `-DTENSORFLOW_LOCATION` variable to cmake.  You can also override its choice of
 compilers with `-DCMAKE_Fortran_COMPILER` and `-DCMAKE_C_COMPILER`.  It's best
-to not mix compilers from different vendors.  You may also specify where the
-library is to be installed with `-DCMAKE_INSTALL_PREFIX`.  So a full
-invocation of `cmake` might look like this:
+to not mix compilers from different vendors, so if you plan on linking this
+code to one built with a particular compiler set, use that.  You may also
+specify where the library is to be installed with `-DCMAKE_INSTALL_PREFIX`.  So
+a full invocation of `cmake` might look like this:
 
 ```
 cmake .. -DTENSORFLOW_LOCATION=/path/to/tf_c_api -DCMAKE_Fortran_COMPILER=ifort -DCMAKE_C_COMPILER=icc -DCMAKE_INSTALL_PREFIX=/path/to/fortran-tf-lib
@@ -41,7 +42,7 @@ cmake .. -DTENSORFLOW_LOCATION=/path/to/tf_c_api -DCMAKE_Fortran_COMPILER=ifort 
 
 By default the build will be a Debug one.  You can set one of the other CMake
 standard build types, such as Release or RelWithDebInfo (Release with Debug
-info) with `-DCMAKE_BUILD_TYPE`.
+info) with e.g. `-DCMAKE_BUILD_TYPE=Release`.
 
 ## Using the library
 
@@ -65,3 +66,19 @@ a set of routines to associate TensorFlow tensors with Fortran arrays.
 ### Using the library directly
 
 Currently this is only documented in the test case.
+
+## Add the library to a CMake build system
+Make sure the `CMAKE_PREFIX_PATH` points to wherever you installed the
+library.  Alternatively you can set pass an option to cmake
+`-DFortranTensorFlow_DIR=<path>`, where path is the location where the
+`FortranTensorFlowConfig.cmake` file is located.  This is usually in
+`CMAKE_INSTALL_PREFIX/lib64/cmake`.
+
+Then in the `CMakeLists.txt` file of the project you want to add the library to
+add lines like:
+```
+find_package(FortranTensorFlow)
+target_add_library(foo FortranTensorFlow::fortran-tf)
+```
+This should add the library to the target (`foo` here) and automatically add
+the Fortran module directory to its compile steps.
