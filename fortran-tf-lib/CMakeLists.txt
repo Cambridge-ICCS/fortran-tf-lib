@@ -102,8 +102,32 @@ install(EXPORT ${PROJECT_NAME}
 # Install Fortran module files
 install(FILES "${CMAKE_BINARY_DIR}/modules/tf_interface.mod"
               "${CMAKE_BINARY_DIR}/modules/tf_types.mod"
- DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/${LIB_NAME}"
- )
+  DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/${LIB_NAME}"
+  )
+
+# Fixture for tests
+add_test(
+    NAME process_model_exists
+    COMMAND process_model --help
+)
+set_tests_properties(
+    process_model_exists
+    PROPERTIES FIXTURES_SETUP process_model
+)
+
+add_test(
+    NAME process_model_output
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+    COMMAND process_model -o ${CMAKE_BINARY_DIR}/test_fortran_gen.F90 ${CMAKE_CURRENT_LIST_DIR}/my_model
+)
+set_tests_properties(
+    process_model_output
+    PROPERTIES FIXTURES_REQUIRED process_model
+)
+set_tests_properties(
+    process_model_output
+    PROPERTIES FIXTURES_SETUP process_model_output
+)
 
 # Executables for tests
 add_executable(test_load_model_f tests/load_model_f.F90)
@@ -115,3 +139,23 @@ add_test(
 )
 set_tests_properties(load_model_f PROPERTIES
     PASS_REGULAR_EXPRESSION "SUCCESS")
+
+# Tests that require process_model_output
+add_test(
+    NAME process_model_1
+    COMMAND ${CMAKE_CTEST_COMMAND}
+        --build-and-test ${CMAKE_CURRENT_LIST_DIR}/tests/generated_code_test
+                         ${CMAKE_CURRENT_BINARY_DIR}/tests/generated_code_test/build
+        --build-generator ${CMAKE_GENERATOR}
+        --test-command ${CMAKE_CTEST_COMMAND}
+        --output-on-failure
+        --build-options -DFORTRAN_TF_LIB=$<TARGET_FILE:${PROJECT_NAME}::${LIB_NAME}>
+          -DFORTRAN_TF_LIB_DIR=${CMAKE_BINARY_DIR}
+          -DGENERATED_CODE_FILE=${CMAKE_BINARY_DIR}/test_fortran_gen.F90
+          -DCMAKE_Fortran_COMPILER=${CMAKE_Fortran_COMPILER}
+          -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
+)
+set_tests_properties(
+    process_model_1
+    PROPERTIES FIXTURES_REQUIRED process_model_output
+)
