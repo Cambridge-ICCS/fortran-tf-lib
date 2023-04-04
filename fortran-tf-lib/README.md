@@ -78,7 +78,7 @@ Then in the `CMakeLists.txt` file of the project you want to add the library to
 add lines like:
 ```
 find_package(FortranTensorFlow)
-target_add_library(foo FortranTensorFlow::fortran-tf)
+target_link_libraries(foo FortranTensorFlow::fortran-tf)
 ```
 This should add the library to the target (`foo` here) and automatically add
 the Fortran module directory to its compile steps.
