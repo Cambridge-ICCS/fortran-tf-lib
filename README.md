@@ -20,7 +20,7 @@ For calling *PyTorch* from Fortran see the [FTorch repository](https://github.co
 It is desirable be able to run machine learning (ML) models directly in Fortran.
 Such models are often trained in some other language (say Python) using popular frameworks (say TensorFlow) and saved.
 We want to run inference on this model without having to call a Python executable.
-To achieve this we use the existing ML C interface.
+To achieve this we use the existing TensorFlow C interface.
 
 This project provides a library enabling a user to directly couple their TensorFlow models to Fortran code.
 We provide installation instructions for the library as well as instructions and examples for performing coupling.
@@ -41,9 +41,10 @@ To install the library requires the following to be installed on the system:
 * TensorFlow C API, download from <https://www.tensorflow.org/install/lang_c><sup>1</sup>
 * Fortran and C compilers
 
-<sup>1</sup> Note that this page sometimes does not list the latest version of the library.  You can
-try altering the URL to reflect the newest version.  E.g. if the URL ends `...-2.11.tar.gz`
-try changing it to `...-2.13.tar.gz`.
+<sup>1</sup> Note that this page sometimes does not list the latest version of
+the library.  You can try altering the library download URLs on the page to
+reflect the newest version.  E.g. if the URL ends `...-2.11.tar.gz` try
+changing it to `...-2.13.tar.gz`.
 
 ### Library installation
 
@@ -76,20 +77,20 @@ To build and install the library:
     | Option                                                                                            | Value                        | Description                                                   |
     | ------------------------------------------------------------------------------------------------- | ---------------------------- | --------------------------------------------------------------|
     | [`CMAKE_Fortran_COMPILER`](https://cmake.org/cmake/help/latest/variable/CMAKE_LANG_COMPILER.html) | `ifort` / `gfortran`         | Specify a Fortran compiler to build the library with. This should match the Fortran compiler you're using to build the code you are calling this library from.        |
-    | [`CMAKE_C_COMPILER`](https://cmake.org/cmake/help/latest/variable/CMAKE_LANG_COMPILER.html)       | `icc` / `gcc`                | Specify a C compiler to build the library with                |
+    | [`CMAKE_C_COMPILER`](https://cmake.org/cmake/help/latest/variable/CMAKE_LANG_COMPILER.html)       | `icc` / `gcc`                | Specify a C compiler to build the library with.                |
     | `TENSORFLOW_LOCATION`<sup>2</sup>   | `</path/to/tensorflow/>`          | Location of TensorFlow C API installation<sup>1</sup> |
-    | [`CMAKE_INSTALL_PREFIX`](https://cmake.org/cmake/help/latest/variable/CMAKE_INSTALL_PREFIX.html)  | `</path/to/install/lib/at/>` | Location at which the library files should be installed. By default this is `/usr/local` |
-    | [`CMAKE_BUILD_TYPE`](https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html)          | `Release` / `Debug`          | Specifies build type. The default is `DEBUG`, use `RELEASE` for production code|
+    | [`CMAKE_INSTALL_PREFIX`](https://cmake.org/cmake/help/latest/variable/CMAKE_INSTALL_PREFIX.html)  | `</path/to/install/lib/at/>` | Location at which the library files should be installed. By default this is `/usr/local`. |
+    | [`CMAKE_BUILD_TYPE`](https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html)          | `Release` / `Debug`          | Specifies build type. The default is `Debug`, use `Release` for production code.|
 
-    <sup>2</sup> This should be the absolute path to where the TensorFlow C API has been installed. CMake will look in `TENSORFLOW_LOCATION` and `TENSORFLOW_LOCATION/lib` for the TensorFlow library `libtensorflow.so`.
+    <sup>2</sup> This should be the absolute path to where the TensorFlow C API mentioned in step 1 has been installed. CMake will look in `TENSORFLOW_LOCATION` and `TENSORFLOW_LOCATION/lib` for the TensorFlow library `libtensorflow.so`.
 4. Make and install the code to the chosen location with:
     ```
     make
     make install
     ```
     This will place the following directories at the install location:  
-    * `include/` - contains mod files
-    * `lib64/` - contains cmake and `.so` files
+    * `CMAKE_INSTALL_PREFIX/include/` - contains mod files
+    * `CMAKE_INSTALL_PREFIX/lib64/` - contains cmake and `.so` files
 
 
 ## Usage
@@ -109,7 +110,8 @@ using the
 functionality from within python.  Note that the TensorFlow C API currently
 (2.13) only supports the Keras "v2" format so you must specify `format='tf'`:
 ```
-# construct model (e.g. model=keras.Model(inputs, outputs))
+import tensorflow as tf
+# construct model (e.g. model=tf.keras.Model(inputs, outputs))
 model.save("my_model", format='tf')
 ```
 
@@ -124,7 +126,7 @@ consult the API documentation, source code, and examples.
 
 This minimal snippet loads a saved Torch model, creates an input consisting of
 a `1x32` matrix (with arbitrary values), and runs the model to infer the
-output.  If you use the model provided in the test cases this code will produce
+output.  If you use the model provided in the test case this code will produce
 the indicated output value.
 
 ```fortran
