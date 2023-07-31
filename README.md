@@ -78,7 +78,7 @@ To build and install the library:
     | ------------------------------------------------------------------------------------------------- | ---------------------------- | --------------------------------------------------------------|
     | [`CMAKE_Fortran_COMPILER`](https://cmake.org/cmake/help/latest/variable/CMAKE_LANG_COMPILER.html) | `ifort` / `gfortran`         | Specify a Fortran compiler to build the library with. This should match the Fortran compiler you're using to build the code you are calling this library from.        |
     | [`CMAKE_C_COMPILER`](https://cmake.org/cmake/help/latest/variable/CMAKE_LANG_COMPILER.html)       | `icc` / `gcc`                | Specify a C compiler to build the library with.                |
-    | `TENSORFLOW_LOCATION`<sup>2</sup>   | `</path/to/tensorflow/>`          | Location of TensorFlow C API installation<sup>1</sup> |
+    | `TENSORFLOW_LOCATION`<sup>2</sup>   | `</path/to/tensorflow/>`          | Location of TensorFlow C API installation<sup>1</sup>. |
     | [`CMAKE_INSTALL_PREFIX`](https://cmake.org/cmake/help/latest/variable/CMAKE_INSTALL_PREFIX.html)  | `</path/to/install/lib/at/>` | Location at which the library files should be installed. By default this is `/usr/local`. |
     | [`CMAKE_BUILD_TYPE`](https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html)          | `Release` / `Debug`          | Specifies build type. The default is `Debug`, use `Release` for production code.|
 
@@ -90,7 +90,7 @@ To build and install the library:
     ```
     This will place the following directories at the install location:  
     * `CMAKE_INSTALL_PREFIX/include/` - contains mod files
-    * `CMAKE_INSTALL_PREFIX/lib64/` - contains cmake and `.so` files
+    * `CMAKE_INSTALL_PREFIX/lib64/` - contains `cmake` directory and `.so` files
 
 
 ## Usage
@@ -108,23 +108,24 @@ The trained model needs to be exported.  This can be done from within your code
 using the
 [`model.save`](https://www.tensorflow.org/guide/keras/serialization_and_saving)
 functionality from within python.  Note that the TensorFlow C API currently
-(2.13) only supports the Keras "v2" format so you must specify `format='tf'`:
+(version 2.13) only supports the Keras "v2" format so you must specify `format='tf'`:
 ```
 import tensorflow as tf
 # construct model (e.g. model=tf.keras.Model(inputs, outputs))
+# or load one (e.g. model=tf.keras.models.load_model('/path/to/model'))
 model.save("my_model", format='tf')
 ```
 
 ### 2. Using the model from Fortran
 
-To use the trained Torch model from within Fortran we need to import the
+To use the trained TensorFlow model from within Fortran we need to import the
 `TF_Interface` module and use the binding routines to load the model, construct
 the tensors, and run inference.
 
 A very simple example is given below.  For more detailed documentation please
 consult the API documentation, source code, and examples.
 
-This minimal snippet loads a saved Torch model, creates an input consisting of
+This minimal snippet loads a saved TensorFlow model, creates an input consisting of
 a `1x32` matrix (with arbitrary values), and runs the model to infer the
 output.  If you use the model provided in the test case this code will produce
 the indicated output value.
@@ -285,7 +286,7 @@ They demonstrate different functionalities and are provided with instructions to
 
 Copyright &copy; ICCS
 
-*Fortran-TF-Lib* is distributed under the [MIT Licence](https://github.com/Cambridge-ICCS/fortran-pytorch-lib/blob/main/LICENSE).
+*Fortran-TF-Lib* is distributed under the [MIT Licence](https://github.com/Cambridge-ICCS/fortran-tf-lib/blob/main/LICENSE).
 
 
 ## Contributions
@@ -316,7 +317,7 @@ Notable contributors to this project are:
 
 * [**@SimonClifford**](https://github.com/SimonClifford)
 
-See [Contributors](https://github.com/Cambridge-ICCS/fortran-pytorch-lib/graphs/contributors)
+See [Contributors](https://github.com/Cambridge-ICCS/fortran-tf-lib/graphs/contributors)
 for a full list.
 
 
